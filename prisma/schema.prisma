@@ -36,11 +36,12 @@ enum PrizeStatus {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  name      String?
-  email     String   @unique
-  role      Role     @default(USER)
-  createdAt DateTime @default(now()) @map("created_at")
+  id           String   @id @default(cuid())
+  name         String?
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  role         Role     @default(USER)
+  createdAt    DateTime @default(now()) @map("created_at")
 
   subscriptions Subscription[]
   scores        Score[]
