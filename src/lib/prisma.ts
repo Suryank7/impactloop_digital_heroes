@@ -10,8 +10,10 @@ const globalForPrisma = globalThis as unknown as {
 export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
-    datasourceUrl: url,
-  });
+    datasources: {
+      db: { url },
+    },
+  } as any);
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
