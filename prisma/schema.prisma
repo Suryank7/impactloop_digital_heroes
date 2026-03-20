@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELLED
+  EXPIRED
+  PAST_DUE
+}
+
+enum DrawStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+}
+
+enum DrawMode {
+  RANDOM
+  ALGORITHM
+}
+
+enum PrizeStatus {
+  PENDING
+  PAID
+  VERIFIED
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String?
+  email     String   @unique
+  role      Role     @default(USER)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  subscriptions Subscription[]
+  scores        Score[]
+  winners       Winner[]
+  donations     Donation[]
+
+  // To map exactly to the DB instruction naming
+  @@map("users")
+}
+
+model Subscription {
+  id                 String             @id @default(cuid())
+  userId             String             @map("user_id")
+  planType           String             @map("plan_type") // monthly / yearly
+  status             SubscriptionStatus @default(ACTIVE)
+  stripeCustomerId   String?            @unique @map("stripe_customer_id")
+  renewalDate        DateTime?          @map("renewal_date")
+  
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@map("subscriptions")
+}
+
+model Score {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  score     Int      // Constrained 1-45 in application layer
+  date      DateTime @default(now())
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, date])
+  @@map("scores")
+}
+
+model Draw {
+  id         String     @id @default(cuid())
+  drawDate   DateTime   @map("draw_date")
+  numbers    Int[]      // Array of precisely 5 ints 
+  mode       DrawMode   @default(RANDOM)
+  status     DrawStatus @default(PENDING)
+  jackpot    Float      @default(0) // Rollover logic anchor
+
+  winners    Winner[]
+
+  @@index([status])
+  @@map("draws")
+}
+
+model Winner {
+  id          String      @id @default(cuid())
+  userId      String      @map("user_id")
+  drawId      String      @map("draw_id")
+  matchCount  Int         @map("match_count") // 3, 4, or 5
+  prizeAmount Float       @map("prize_amount")
+  status      PrizeStatus @default(PENDING)
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  draw        Draw        @relation(fields: [drawId], references: [id], onDelete: Cascade)
+
+  // A user can theoretically win only one prize tier per draw
+  @@unique([userId, drawId]) 
+  @@index([drawId, matchCount])
+  @@map("winners")
+}
+
+model Charity {
+  id             String     @id @default(cuid())
+  name           String     @unique
+  description    String?
+  image          String?
+  totalDonations Float      @default(0) @map("total_donations")
+  
+  donations      Donation[]
+
+  @@map("charities")
+}
+
+model Donation {
+  id         String   @id @default(cuid())
+  userId     String   @map("user_id")
+  charityId  String   @map("charity_id")
+  amount     Float
+  percentage Float?
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  charity    Charity  @relation(fields: [charityId], references: [id], onDelete: Cascade)
+
+  @@index([charityId])
+  @@map("donations")
+}
