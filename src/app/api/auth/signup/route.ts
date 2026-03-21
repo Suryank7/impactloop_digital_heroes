@@ -5,7 +5,7 @@ import { hashPassword } from "../../../../server/security/auth";
 import jwt from "jsonwebtoken";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "sk_test_dummy", {
   apiVersion: "2025-01-27" as any,
 });
 
