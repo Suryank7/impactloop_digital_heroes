@@ -35,7 +35,7 @@ export async function GET() {
     }
 
     const session = await stripe.billingPortal.sessions.create({
-      customer: user.subscriptions[0].stripeId,
+      customer: user.subscriptions[0].stripeCustomerId!,
       return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/profile`,
     });
 

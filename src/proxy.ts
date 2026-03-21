@@ -9,7 +9,7 @@ const JWT_SECRET = new TextEncoder().encode(
 const PROTECTED_ROUTES = ["/dashboard", "/scores", "/draw", "/profile"];
 const AUTH_ROUTES = ["/login", "/signup"];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get("auth_token")?.value;
 

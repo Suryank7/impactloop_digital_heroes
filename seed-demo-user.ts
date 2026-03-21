@@ -14,13 +14,13 @@ async function main() {
     update: {
       name,
       passwordHash,
-      role: "MEMBER",
+      role: "USER",
     },
     create: {
       name,
       email,
       passwordHash,
-      role: "MEMBER",
+      role: "USER",
     },
   });
 

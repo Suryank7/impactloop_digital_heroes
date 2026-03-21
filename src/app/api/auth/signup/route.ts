@@ -28,7 +28,7 @@ export async function POST(req: Request) {
         name,
         email,
         passwordHash,
-        role: "MEMBER",
+        role: "USER",
       },
     });
 
