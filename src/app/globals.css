@@ -1,16 +1,20 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: #020617; /* Deep charcoal/black */
-  --color-foreground: #f8fafc; /* Light text */
-  --color-primary-start: #2563eb; /* Neon blue */
-  --color-primary-end: #9333ea; /* Electric purple */
-  --color-accent: #facc15; /* Gold for winnings */
-  --color-success: #22c55e; /* Green glow */
-  --color-danger: #ef4444; /* Soft red */
+  --color-background: #0A0A0A; /* Deep matte black */
+  --color-foreground: #F8FAFC; 
+  --color-primary: #3B82F6; /* Electric Blue */
+  --color-secondary: #8B5CF6; /* Neon Purple */
+  --color-accent: #FACC15; /* Gold */
+  --color-success: #10B981; /* Emerald */
+  --color-danger: #EF4444; 
   
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  --shadow-neon: 0 0 15px rgba(59, 130, 246, 0.4), 0 0 30px rgba(139, 92, 246, 0.2);
+  --shadow-gold: 0 0 15px rgba(250, 204, 21, 0.3);
+  --shadow-success: 0 0 15px rgba(16, 185, 129, 0.3);
 }
 
 body {
@@ -19,40 +23,57 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  overflow-x: hidden;
 }
 
-@keyframes shimmer {
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-/* Glassmorphism Utilities */
+/* Base Glassmorphism */
 @utility glass {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 @utility glass-panel {
-  background: rgba(30, 41, 59, 0.4); /* slate-800 mostly transparent */
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
 }
 
+/* Glow Effects */
 @utility neon-glow {
-  box-shadow: 0 0 15px rgba(37, 99, 235, 0.5), 0 0 30px rgba(147, 51, 234, 0.3);
+  box-shadow: var(--shadow-neon);
 }
 
 @utility success-glow {
-  box-shadow: 0 0 15px rgba(34, 197, 94, 0.4);
+  box-shadow: var(--shadow-success);
 }
 
+@utility gold-glow {
+  box-shadow: var(--shadow-gold);
+}
+
+/* Gradient Text */
 @utility text-gradient {
-  background: linear-gradient(to right, var(--color-primary-start), var(--color-primary-end));
+  background: linear-gradient(to right, var(--color-primary), var(--color-secondary));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* Noise Texture Overlay */
+.noise-bg {
+  position: relative;
+}
+
+.noise-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("https://grainy-gradients.vercel.app/noise.svg");
+  opacity: 0.05;
+  pointer-events: none;
+  z-index: 10;
+  mix-blend-mode: overlay;
 }

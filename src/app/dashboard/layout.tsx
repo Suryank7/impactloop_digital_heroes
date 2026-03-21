@@ -2,90 +2,124 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Award, History, User, LogOut } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { 
+  LayoutDashboard, 
+  Trophy, 
+  Heart, 
+  User, 
+  LogOut, 
+  ChevronRight,
+  Settings,
+  HelpCircle,
+  Menu
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useAuth } from "@/components/auth-provider";
+import { useState } from "react";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { user, logout } = useAuth();
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
-  const navigation = [
+  const Sparkles = ({ className }: { className?: string }) => (
+    <div className={cn("w-5 h-5 relative", className)}>
+      <motion.div 
+        animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
+        transition={{ duration: 2, repeat: Infinity }}
+        className="absolute inset-0 bg-[#3B82F6]/20 blur-sm rounded-full" 
+      />
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="w-1.5 h-1.5 bg-white rounded-full shadow-[0_0_8px_white]" />
+      </div>
+    </div>
+  );
+
+  const menuItems = [
     { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
-    { name: "My Scores", href: "/dashboard/scores", icon: Award },
-    { name: "Draw History", href: "/dashboard/draws", icon: History },
-    { name: "Profile", href: "/dashboard/profile", icon: User },
+    { name: "My Scores", href: "/dashboard/scores", icon: Trophy },
+    { name: "Draw Results", href: "/dashboard/draw", icon: Sparkles },
+    { name: "Charity Hub", href: "/dashboard/charity", icon: Heart },
   ];
 
   return (
-    <div className="flex h-screen bg-[#020617] overflow-hidden pt-20">
-      {/* Sidebar Desktop */}
-      <aside className="hidden w-64 md:flex flex-col border-r border-white/5 bg-slate-950/50 backdrop-blur-xl">
-        <div className="flex-1 overflow-y-auto py-8 px-4">
-          <nav className="space-y-2">
-            {navigation.map((item) => {
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={cn(
-                    "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors relative group",
-                    isActive ? "text-white" : "text-slate-400 hover:text-white"
-                  )}
-                >
-                  {isActive && (
-                    <motion.div
-                      layoutId="sidebar-active"
-                      className="absolute inset-0 bg-blue-600/10 border border-blue-500/20 rounded-xl"
-                      initial={false}
-                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                    />
-                  )}
-                  <item.icon className={cn("h-5 w-5 relative z-10", isActive && "text-blue-400")} />
-                  <span className="relative z-10">{item.name}</span>
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
-        <div className="p-4 border-t border-white/5">
-          <button className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-400 hover:text-red-400 hover:bg-white/5 w-full transition-colors">
-            <LogOut className="h-5 w-5" />
-            Sign out
+    <div className="flex min-h-screen bg-[#0A0A0A] noise-bg">
+      {/* Sidebar */}
+      <motion.aside 
+        initial={false}
+        animate={{ width: isCollapsed ? 80 : 280 }}
+        className="fixed left-0 top-0 bottom-0 z-50 border-r border-white/5 bg-[#0A0A0A]/80 backdrop-blur-2xl flex flex-col pt-8 pb-4 transition-all"
+      >
+        <div className="px-6 mb-12 flex items-center justify-between">
+          {!isCollapsed && (
+            <Link href="/" className="flex items-center gap-3 group">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#3B82F6] to-[#8B5CF6] flex items-center justify-center shadow-neon">
+                <div className="w-2.5 h-2.5 bg-white rounded-full" />
+              </div>
+              <span className="text-xl font-black text-white tracking-tighter">ImpactLoop</span>
+            </Link>
+          )}
+          <button 
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="p-2 rounded-xl hover:bg-white/5 text-slate-500 hover:text-white transition-colors"
+          >
+            <Menu className="w-5 h-5" />
           </button>
         </div>
-      </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-y-auto relative z-0 hide-scrollbar">
-        {children}
-      </main>
-
-      {/* Mobile Bottom Nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 glass-panel border-t border-white/5 flex justify-around p-3 z-50">
-         {navigation.map((item) => {
+        <nav className="flex-1 px-4 space-y-2">
+          {menuItems.map((item) => {
             const isActive = pathname === item.href;
             return (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={cn(
-                  "flex flex-col items-center p-2 rounded-lg relative",
-                  isActive ? "text-blue-400" : "text-slate-500"
-                )}
-              >
-                {isActive && (
-                  <motion.div
-                    layoutId="mobile-nav-active"
-                    className="absolute inset-x-0 bottom-0 h-1 bg-blue-500 rounded-t-full"
-                  />
-                )}
-                <item.icon className="h-5 w-5 mb-1" />
-                <span className="text-[10px] font-medium">{item.name}</span>
+              <Link key={item.name} href={item.href}>
+                <motion.div
+                  whileHover={{ x: 4 }}
+                  className={cn(
+                    "flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-300 group relative",
+                    isActive ? "bg-white/10 text-white shadow-neon" : "text-slate-500 hover:text-slate-200 hover:bg-white/5"
+                  )}
+                >
+                  <item.icon className={cn("w-5 h-5", isActive ? "text-[#3B82F6]" : "group-hover:text-white")} />
+                  {!isCollapsed && <span className="font-bold tracking-tight text-sm">{item.name}</span>}
+                  {isActive && !isCollapsed && <ChevronRight className="ml-auto w-4 h-4 opacity-50" />}
+                  
+                  {isActive && (
+                    <motion.div 
+                      layoutId="sidebar-active"
+                      className="absolute left-0 w-1 h-6 bg-[#3B82F6] rounded-full"
+                    />
+                  )}
+                </motion.div>
               </Link>
             );
           })}
-      </nav>
+        </nav>
+
+        <div className="px-4 space-y-2">
+          <Link href="/dashboard/profile">
+            <div className="flex items-center gap-4 px-4 py-3.5 rounded-2xl text-slate-500 hover:text-white hover:bg-white/5 transition-all">
+              <User className="w-5 h-5" />
+              {!isCollapsed && <span className="font-bold tracking-tight text-sm">Account</span>}
+            </div>
+          </Link>
+          <button 
+            onClick={logout}
+            className="w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl text-slate-500 hover:text-red-400 hover:bg-red-500/5 transition-all"
+          >
+            <LogOut className="w-5 h-5" />
+            {!isCollapsed && <span className="font-bold tracking-tight text-sm">Sign Out</span>}
+          </button>
+        </div>
+      </motion.aside>
+
+      {/* Main Content */}
+      <main className={cn(
+        "flex-1 transition-all duration-300",
+        isCollapsed ? "ml-20" : "ml-[280px]"
+      )}>
+        {children}
+      </main>
     </div>
   );
 }

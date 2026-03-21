@@ -10,6 +10,8 @@ export const metadata: Metadata = {
   description: "A premium reward system and charity platform.",
 };
 
+import { AuthProvider } from "@/components/auth-provider";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -18,8 +20,10 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${inter.className} min-h-screen bg-[#020617] text-slate-50 antialiased selection:bg-blue-500/30 overflow-x-hidden`}>
-        <Navbar />
-        <main>{children}</main>
+        <AuthProvider>
+          <Navbar />
+          <main>{children}</main>
+        </AuthProvider>
       </body>
     </html>
   );

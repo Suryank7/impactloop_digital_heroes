@@ -18,38 +18,40 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     // Variant classes upgraded for premium feel
     const variants = {
       default: "bg-white text-slate-950 shadow-[0_2px_10px_rgba(255,255,255,0.1)] hover:bg-slate-100 hover:shadow-[0_5px_20px_rgba(255,255,255,0.2)]",
-      neon: "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] hover:shadow-[0_0_40px_rgba(147,51,234,0.6)] border border-white/10 hover:border-white/20",
-      outline: "border border-slate-700/50 bg-slate-900/50 backdrop-blur-md text-slate-100 hover:border-slate-600 hover:bg-slate-800",
-      ghost: "hover:bg-slate-800/80 text-slate-300 hover:text-white",
-      glass: "bg-white/5 backdrop-blur-md border border-white/10 text-white hover:bg-white/10",
+      neon: "bg-gradient-to-r from-[#3B82F6] to-[#8B5CF6] text-white shadow-[0_0_20px_rgba(59,130,246,0.3)] hover:shadow-[0_0_40px_rgba(139,92,246,0.5)] border border-white/10 hover:border-white/25",
+      outline: "border border-white/10 bg-transparent text-slate-100 hover:border-white/20 hover:bg-white/5 backdrop-blur-sm",
+      ghost: "hover:bg-white/5 text-slate-400 hover:text-white",
+      glass: "bg-white/5 backdrop-blur-xl border border-white/10 text-white hover:bg-white/10 hover:border-white/20",
     };
 
     // Size classes
     const sizes = {
-      default: "h-11 px-5 py-2",
-      sm: "h-9 rounded-lg px-4",
-      lg: "h-14 rounded-2xl px-8 text-base tracking-wide",
-      icon: "h-11 w-11 rounded-xl",
+      default: "h-12 px-6 py-2",
+      sm: "h-10 rounded-lg px-4",
+      lg: "h-16 rounded-2xl px-10 text-lg tracking-tight font-black",
+      icon: "h-12 w-12 rounded-xl",
     };
 
     return (
       <motion.button
         ref={ref}
         className={cn(baseClasses, variants[variant], sizes[size], className)}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.97 }}
+        whileHover={{ scale: 1.05, y: -2 }}
+        whileTap={{ scale: 0.95 }}
         {...props}
       >
         {variant === 'neon' && (
-           <>
-              <span className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-500 opacity-0 group-hover:opacity-100 mix-blend-overlay transition-opacity duration-500" />
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-20 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] transition-opacity duration-500 pointer-events-none mix-blend-overlay" />
-           </>
+          <motion.div 
+            className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"
+            initial={false}
+            animate={{ scale: [1, 1.2], opacity: [0, 0.2, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          />
         )}
-        {(variant === 'default' || variant === 'glass') && (
-           <span className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:animate-[shimmer_1.5s_infinite] transition-transform" />
-        )}
-        <span className="relative z-10 flex items-center gap-2">{children as React.ReactNode}</span>
+        <span className="relative z-10 flex items-center justify-center gap-2">{children as React.ReactNode}</span>
+        
+        {/* Inner glow effect */}
+        <div className="absolute inset-0 rounded-xl border border-white/0 group-hover:border-white/10 pointer-events-none transition-colors" />
       </motion.button>
     );
   }

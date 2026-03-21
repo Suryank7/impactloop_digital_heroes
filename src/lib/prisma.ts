@@ -37,9 +37,24 @@ export const prisma: PrismaClient = (globalForPrisma.prisma ||
       });
     }
 
-    const client = new PrismaClient();
-    if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = client;
-    return client;
+    try {
+      const client = new PrismaClient();
+      if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = client;
+      return client;
+    } catch (e) {
+      console.warn("Prisma initialization failed. Falling back to proxy.", e);
+      return new Proxy({} as any, {
+        get: (target, prop) => {
+          if (prop === "module") return undefined;
+          if (prop === "$on") return () => {};
+          if (prop === "toJSON") return () => "PrismaProxy";
+          const dummyFunc = () => Promise.resolve(null);
+          return new Proxy(dummyFunc, {
+            get: (t, subProp) => () => Promise.resolve(null),
+          });
+        },
+      });
+    }
   })()) as PrismaClient;
 
 export default prisma;

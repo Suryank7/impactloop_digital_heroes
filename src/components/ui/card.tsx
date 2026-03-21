@@ -42,23 +42,24 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     };
 
     const variants = {
-      glass: "bg-slate-900/40 backdrop-blur-xl border-white/5 shadow-2xl relative",
-      solid: "bg-slate-900 border-white/5 relative shadow-xl",
-      neonOutline: "bg-slate-900/60 backdrop-blur-2xl border-blue-500/30 shadow-[0_0_30px_-5px_rgba(59,130,246,0.3)] relative group",
+      glass: "bg-[#0A0A0A]/40 backdrop-blur-3xl border-white/5 shadow-2xl relative",
+      solid: "bg-[#0A0A0A] border-white/10 relative shadow-xl",
+      neonOutline: "bg-[#0A0A0A]/60 backdrop-blur-2xl border-[#3B82F6]/30 shadow-[0_0_30px_-5px_rgba(59,130,246,0.3)] relative group",
     };
 
     return (
       <motion.div
         ref={ref}
         className={cn(
-          "rounded-2xl border overflow-hidden transition-all duration-300",
+          "rounded-[2rem] border overflow-hidden transition-all duration-500",
           variants[variant],
           className
         )}
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, scale: 0.95 }}
+        whileInView={{ opacity: 1, scale: 1 }}
         viewport={{ once: true, margin: "-50px" }}
-        transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        whileHover={interactive ? { y: -8, scale: 1.01, borderColor: "rgba(255,255,255,0.15)" } : {}}
         {...(interactive ? {
            onMouseMove: handleMouseMove,
            onFocus: handleFocus,
@@ -71,10 +72,10 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
         <div ref={divRef} className="absolute inset-0 z-0 h-full w-full pointer-events-none">
           {interactive && (
             <div
-              className="absolute inset-0 z-0 transition-opacity duration-500"
+              className="absolute inset-0 z-0 transition-opacity duration-700"
               style={{
-                opacity,
-                background: `radial-gradient(600px circle at ${position.x}px ${position.y}px, rgba(255,255,255,.06), transparent 40%)`,
+                opacity: opacity * 0.5,
+                background: `radial-gradient(1000px circle at ${position.x}px ${position.y}px, rgba(59,130,246,0.1), transparent 45%)`,
               }}
             />
           )}
@@ -82,10 +83,13 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
             <div
                className="absolute inset-0 z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700"
                style={{
-                 background: `radial-gradient(800px circle at ${position.x}px ${position.y}px, rgba(59,130,246,.15), transparent 40%)`,
+                 background: `radial-gradient(800px circle at ${position.x}px ${position.y}px, rgba(139,92,246,0.08), transparent 40%)`,
                }}
             />
           )}
+          
+          {/* Noise texture overlay on cards */}
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] mix-blend-overlay" />
         </div>
         <div className="relative z-10 w-full h-full">{children as React.ReactNode}</div>
       </motion.div>

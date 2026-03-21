@@ -46,17 +46,33 @@ export function verifyToken(token: string): { userId: string; role: string } {
 }
 
 /**
- * Extracts and verifies JWT from Authorization header
+ * Extracts and verifies JWT from Authorization header OR HttpOnly Cookie
  */
 export function verifyAuthFromRequest(req: Request): {
   userId: string;
   role: string;
 } {
+  // 1. Check Header
   const authHeader = req.headers.get("authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    throw new Error("UNAUTHORIZED: Missing authorization header");
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    return verifyToken(authHeader.split(" ")[1]);
   }
-  return verifyToken(authHeader.split(" ")[1]);
+
+  // 2. Check Cookie (Manual parse for edge/universal compatibility)
+  const cookieHeader = req.headers.get("cookie");
+  if (cookieHeader) {
+    const cookies = Object.fromEntries(
+      cookieHeader.split("; ").map((c) => {
+        const [key, ...v] = c.split("=");
+        return [key, v.join("=")];
+      })
+    );
+    if (cookies.auth_token) {
+      return verifyToken(cookies.auth_token);
+    }
+  }
+
+  throw new Error("UNAUTHORIZED: Missing authorization session");
 }
 
 /**
